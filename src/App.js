@@ -1,4 +1,7 @@
 import React from 'react';
+import axios from 'axios';
+import Movie from './Movie';
+import './App.css';
 
 /**
  * React.Component 가 갖고 있는 function
@@ -23,29 +26,25 @@ class App extends React.Component{
     super();
     console.log("Hello");
   }
+
   // state 을 사용 하려면 React.Component 안에서 사용해야 함
   state = {
-    count: 0
+    isLoading: true,
+    movies: []
   };
 
-  add = () => {
-    console.log("add");
-    // setState() 을 호출할 때마다 react는 새로운 state와 함께 render() 를 호출
-    // current 는 this.state 를 반환 this.state.xxxxx 사용 X
-    this.setState(current => ({
-      count: current.count + 1
-    }));
-  };
-
-  minus = () => {
-    console.log("minus");
-    this.setState(current => ({
-      count: current.count - 1
-    }));
-  };
+  getMovies = async() => {
+    return await axios.get("https://yts-proxy.now.sh/list_movies.json?sort_by=rating");
+  }
 
   componentDidMount(){
-    console.log("componentDidMount");
+    this.getMovies().then((json) => {
+      const { data: { data: { movies } }} = json; // ES6
+      this.setState((current) => ({
+        isLoading: false,
+        movies,
+      }));
+    });
   }
 
   componentDidUpdate(){
@@ -57,13 +56,29 @@ class App extends React.Component{
   }
   
   render(){
-    console.log("React");
+    const { isLoading, movies } = this.state; // ES6
     return (
-      <div>
-        <h1>The number is: {this.state.count}</h1>
-        <button onClick={this.add}>Add</button> {/* this.add() 즉시 실행되고 클릭하면 실행 안됨 */}
-        <button onClick={this.minus}>Minus</button>
-      </div>
+      <section class="container">
+        {
+          isLoading ? (
+            <div class="loader">
+              <span class="loader__text">Loading...</span>
+            </div>
+          ) : (
+            <div class="movies">
+              {movies.map(movie =>
+                <Movie
+                  id={movie.id}
+                  year={movie.year}
+                  title={movie.title}
+                  summary={movie.summary}
+                  poster={movie.medium_cover_image}
+                />
+              )}
+            </div>
+          )
+        }
+      </section>
     )
   }
 }
