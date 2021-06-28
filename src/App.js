@@ -12,7 +12,7 @@ function App(){
         <Navigation />
         <Route path="/" exact={true} component={Home} /> {/* exact={true} 정확히 매칭되는 URL 일때만 렌더링 됨 */}
         <Route path="/about" component={About} />
-        <Route path="/movie-detail" component={Detail} />
+        <Route path="/movie/:id" component={Detail} />
       </BrowserRouter>
   )
 }
